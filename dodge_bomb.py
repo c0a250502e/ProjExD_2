@@ -39,8 +39,7 @@ def gameover(screen: pg.Surface) -> None:
     pg.draw.rect(screen,(0, 0, 0), (0, 0, WIDTH, HEIGHT))
     black.set_alpha(128)
     fonto = pg.font.Font(None,80)
-    txt = fonto.render("Game Over",
-                       True, (255,255,255))
+    txt = fonto.render("Game Over", True, (255,255,255))
     fonto_rct = txt.get_rect()
     fonto_rct.center = (WIDTH // 2, HEIGHT // 2)
     game_img = pg.image.load("fig/8.png")
