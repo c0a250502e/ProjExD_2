@@ -14,6 +14,7 @@ DELTA = {
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     引数で与えられたRectが画面内か画面外かを判定する関数
@@ -27,6 +28,7 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     if rct.top < 0 or HEIGHT < rct.bottom:  # 縦方向判定
         tate = False
     return yoko, tate
+
 
 def gameover(screen: pg.Surface) -> None:
     """
@@ -54,6 +56,17 @@ def gameover(screen: pg.Surface) -> None:
     pg.display.update()
     time.sleep(5)
 
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    bb_imgs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    bb_accs = [a for a in range(1, 11)]
+    return bb_imgs, bb_accs
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -61,6 +74,8 @@ def main():
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
+
+    bb_imgs, bb_accs = init_bb_imgs()
 
     bb_img = pg.Surface((20,20))
     pg.draw.circle(bb_img, (225, 0, 0),(10,10),10)
@@ -85,6 +100,11 @@ def main():
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
+        avx = vx * bb_accs[min(tmr // 50, 9)]
+        avy = vy * bb_accs[min(tmr // 50, 9)]
+        bb_img = bb_imgs[min(tmr // 50, 9)]
+        bb_rct.width = bb_img.get_rect().width
+        bb_rct.height = bb_img.get_rect().height
         # if key_lst[pg.K_UP]:
         #     sum_mv[1] -= 5
         # if key_lst[pg.K_DOWN]:
@@ -101,7 +121,7 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx,vy)
+        bb_rct.move_ip(avx,avy)
         yoko,tate = check_bound(bb_rct)
         if not yoko:
             vx *= -1
@@ -111,6 +131,8 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
+
+
 
 
 if __name__ == "__main__":
